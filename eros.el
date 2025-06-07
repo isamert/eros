@@ -256,11 +256,15 @@ This function also removes itself from `pre-command-hook'."
 (defun eros-eval-defun (edebug-it)
   "Wrapper for `eval-defun' that overlays results."
   (interactive "P")
-  (eros--eval-overlay
-   (eval-defun edebug-it)
-   (save-excursion
-     (end-of-defun)
-     (point))))
+  (let ((result (eval-defun edebug-it)))
+    (setq eros--last-result result)
+    (when (get-buffer eros--inspect-buffer-name)
+      (eros-inspect-last-result))
+    (eros--eval-overlay
+     result
+     (save-excursion
+       (end-of-defun)
+       (point)))))
 
 (defun eros-inspect-last-result ()
   "Inspect the result of last `eros-eval-'."
